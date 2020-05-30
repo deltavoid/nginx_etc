@@ -1,0 +1,87 @@
+# http_proxy 设置
+    #client_max_body_size   10m;
+    #client_body_buffer_size   128k;
+    #proxy_connect_timeout   75;
+    #proxy_send_timeout   75;
+    #proxy_read_timeout   75;
+    #proxy_buffer_size   4k;
+    #proxy_buffers   4 32k;
+    #proxy_busy_buffers_size   64k;
+    #proxy_temp_file_write_size  64k;
+    #proxy_temp_path   /usr/local/nginx/proxy_temp 1 2;
+  
+  
+# 设定负载均衡后台服务器列表 
+    upstream  backend  { 
+        #ip_hash; 
+        #server   192.168.10.100:8080 max_fails=2 fail_timeout=30s ;  
+        #server   192.168.10.101:8080 max_fails=2 fail_timeout=30s ;  
+        server   10.3.48.207:8080 max_fails=2 fail_timeout=30s ;  
+        server   10.3.48.207:8081 max_fails=2 fail_timeout=30s ;  
+    }
+  
+  
+  
+# 很重要的虚拟主机配置
+    server {
+        listen       8000;
+        #server_name  itoatest.example.com;
+        server_name  _;
+
+        root   /var/www/proxy_example;
+
+        
+        #charset utf-8;
+        
+        #access_log  logs/host.access.log  main;
+        
+        #对 / 所有做负载均衡+反向代理
+        location / {
+            #root   /var/www/proxy_example;
+            #index  index.html index.htm index.php index.jsp;
+            
+            proxy_pass        http://backend;  
+            #proxy_pass  http://10.3.48.207:8080;
+            #proxy_pass  http://127.0.0.1:80;
+
+            #proxy_redirect off;
+            
+            # 后端的Web服务器可以通过X-Forwarded-For获取用户真实IP
+            proxy_set_header  Host  $host;
+            proxy_set_header  X-Real-IP  $remote_addr;  
+            proxy_set_header  X-Forwarded-For  $proxy_add_x_forwarded_for;
+            proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
+            
+        }
+        
+        #静态文件，nginx自己处理，不去backend请求tomcat
+        #location  ~* /download/ {  
+        #    root /var/www/proxy_example/download;     
+        #}
+
+        #location ~ .*\.(gif|jpg|jpeg|bmp|png|ico|txt|js|css)$   {   
+        #    root /var/www/proxy_example/pictures;   
+        #    expires      7d; 
+        #}
+
+        #location /nginx_status {
+        #    stub_status on;
+        #    #access_log off;
+        #    allow all;
+        #    #allow 192.168.10.0/24;
+        #    #deny all;
+        #}
+
+        #location ~ ^/(WEB-INF)/ {   
+        #    deny all;   
+        #}
+        
+        #error_page  404              /404.html;
+        # redirect server error pages to the static page /50x.html
+        #
+        #error_page   500 502 503 504  /50x.html;
+        #location = /50x.html {
+        #    root   html;
+        #}
+
+    }
