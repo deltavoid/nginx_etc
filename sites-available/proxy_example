@@ -55,14 +55,14 @@
         }
         
         #静态文件，nginx自己处理，不去backend请求tomcat
-        #location  ~* /download/ {  
-        #    root /var/www/proxy_example/download;     
-        #}
-
-        location ~ .*\.(gif|jpg|jpeg|bmp|png|ico|txt|js|css)$   {   
-            root /var/www/proxy_example;   
-            expires      7d; 
+        location  ~* /download/ {  
+            root /var/www/proxy_example;     
         }
+
+        #location ~ .*\.(gif|jpg|jpeg|bmp|png|ico|txt|js|css)$   {   
+        #    root /var/www/proxy_example;   
+        #    expires      7d; 
+        #}
 
         #location /nginx_status {
         #    stub_status on;
