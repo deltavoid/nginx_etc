@@ -8,7 +8,7 @@ server {
 
 	server_name _;
 
-	root /var/www/proxy;
+	root /var/www/proxy_simple;
 
 #	index index.html;
 #	index none;
